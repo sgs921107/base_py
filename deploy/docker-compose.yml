@@ -1,0 +1,50 @@
+# 配置文件版本
+version: "3"
+
+
+# 管理的服务
+services:
+
+    demo:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: ${IMAGE_NAME}:latest
+        container_name: demo
+        hostname: demo
+        volumes:
+            # 项目目录
+            - ..:${PROJECT_DIR}:ro
+            # crontab配置
+            - ../configs/crontab.ini:/var/spool/cron/root:ro
+            # 日志轮转配置
+            - ../configs/logrotate_conf:/etc/logrotate.d/logrotate_conf:ro
+            # 项目配置文件目录
+            - ${HOST_CONF_DIR}:${PROJECT_ENV}:rw
+            # 项目日志目录
+            - ${HOST_LOG_DIR}:${LOG_DIR}:rw
+        working_dir: ${PROJECT_DIR}/bin
+        environment:
+            PROJECT_DIR: ${PROJECT_DIR}
+            PROJECT_ENV: ${PROJECT_ENV}
+        privileged: true
+        command:
+            - /bin/bash
+            - -c
+            - |
+                /bin/bash run.sh &
+                /usr/sbin/init
+        logging:
+            driver: json-file
+            options:
+                max-size: 200m
+                max-file: "3"
+        restart: always
+        networks:
+            - py3
+
+
+networks:
+    py3:
+        ipam:
+            driver: default

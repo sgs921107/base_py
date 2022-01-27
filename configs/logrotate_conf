@@ -1,0 +1,9 @@
+/var/log/base_pyp/demo1.log
+{
+    missingok
+    daily
+    copytruncate
+    rotate 2
+    notifempty
+    size 200M
+}

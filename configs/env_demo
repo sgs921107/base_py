@@ -1,0 +1,47 @@
+# [HOST]
+# 宿主机项目目录
+HOST_PROJECT_DIR=/data/base_pyp
+# 宿主机项目日志文件目录
+HOST_LOG_DIR=/var/log/base_pyp
+# docker仓库地址
+HOST_DOCKER_REPOSITORY=
+
+# [redis]
+# 项目使用的redis key的前缀 example: pyp -> pyp:redis_key
+redis_prefix=pyp
+redis_host=127.0.0.1
+redis_port=6379
+# redis模式 1: cluster(集群) 2: ""(单机)
+redis_mode=
+# redis db num集群模式则忽略
+redis_db=0
+# redis服务的密码
+redis_password=
+
+# [mysql]
+# 项目创建表的前缀 example: pyp -> pyp_table_name
+mysql_prefix=pyp
+mysql_host=127.0.0.1
+mysql_port=3306
+mysql_user=root
+mysql_password=123456
+mysql_db=test_db
+mysql_charset=utf8mb4
+# mysql连接池的最大连接数
+mysql_pool_size=30
+
+# [rabbitmq]
+rabbitmq_host=127.0.0.1
+rabbitmq_port=5672
+rabbitmq_username=test
+rabbitmq_password=123456
+rabbitmq_vhost=
+rabbitmq_heartbeat=10
+
+# [log]
+# 日志等级
+log_level=INFO
+
+# [srv]
+# http请求的超时时间
+srv_timeout=20
