@@ -4,7 +4,7 @@
 Author: xiangcai
 Date: 2022-01-10 15:19:43
 LastEditors: xiangcai
-LastEditTime: 2022-01-10 15:19:43
+LastEditTime: 2022-02-10 17:23:17
 Description: file content
 '''
 
@@ -161,7 +161,6 @@ class UserAgentFactory(object):
         self.gen_ua_funcs = is_mobile and [
             self.gen_mobile_uc_ua,
             self.gen_mobile_nexus10_ua
-
         ] or [
             self.gen_chrome_ua,
             self.gen_firefox_ua,
