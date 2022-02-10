@@ -2,6 +2,7 @@
 # -*- coding=utf8 -*-
 
 import logging.config
+from typing import Any
 from os import environ, path
 from pydantic import BaseModel, Field
 
@@ -71,14 +72,14 @@ class Config(BaseModel):
             setattr(cls, "instance", cls.load_envs())
         return getattr(cls, "instance")
 
-    def get(self, configuration):
+    def get(self, configuration, default: Any = None):
         if hasattr(self, configuration):
             return getattr(self, configuration)
         else:
             self.get_logger().warning(
                 "Try to get an unexpected option: %s" % configuration
             )
-            return None
+            return default
 
     @classmethod
     def get_logger(cls):
