@@ -27,11 +27,10 @@ class AChannel(RobustChannel):
         immediate: bool = False,
         timeout: Union[int, float] = None
     ):
-        default_exchange = self.default_exchange
-        if default_exchange is None:
+        if self.default_exchange is None:
             logger.error("PublishMessageFailed: channel not connected")
             return None
-        return await default_exchange.channel.publish(
+        return await self.default_exchange.channel.publish(
             message,
             routing_key,
             mandatory=mandatory,
@@ -50,11 +49,10 @@ class AChannel(RobustChannel):
         immediate: bool = False,
         timeout: TimeoutType = None
     ):
-        default_exchange = self.default_exchange
-        if default_exchange is None:
+        if self.default_exchange is None:
             logger.error("PublishMessageFailed: channel not connected")
             return None
-        return await default_exchange.channel.basic_publish(
+        return await self.default_exchange.channel.basic_publish(
             body,
             exchange=exchange,
             routing_key=routing_key,
@@ -75,11 +73,10 @@ class AChannel(RobustChannel):
         consumer_tag: str = None,
         timeout: TimeoutType = None
     ):
-        default_exchange = self.default_exchange
-        if default_exchange is None:
+        if self.default_exchange is None:
             logger.error("ConsumeMessageFailed: channel not connected")
             return None
-        return await default_exchange.channel.basic_consume(
+        return await self.default_exchange.channel.basic_consume(
             queue,
             consumer_callback,
             no_ack=no_ack,
@@ -95,11 +92,10 @@ class AChannel(RobustChannel):
         no_ack: bool = False,
         timeout: TimeoutType = None
     ):
-        default_exchange = self.default_exchange
-        if default_exchange is None:
+        if self.default_exchange is None:
             logger.error("ConsumeMessageFailed: channel not connected")
             return None
-        return await default_exchange.channel.basic_get(
+        return await self.default_exchange.channel.basic_get(
             queue,
             no_ack,
             timeout
