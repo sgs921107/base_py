@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding=utf8 -*-
+from typing import List
 
 from aredis import StrictRedis, StrictRedisCluster
 
@@ -29,6 +30,7 @@ class _ARedis(StrictRedis):
     return ret
     """
 
+    # 向zset中加入元素并只保留指定数量的元素
     zaddrembyrank_script = """
     local name = KEYS[1]
     local startNum = ARGV[1]
@@ -39,6 +41,7 @@ class _ARedis(StrictRedis):
     return ret
     """
 
+    # 向list中插入元素并只保留指定数量的元素
     lpushtrim_script = """
     local name = KEYS[1]
     local startNum = ARGV[1]
@@ -58,6 +61,24 @@ class _ARedis(StrictRedis):
     local unpack = unpack or table.unpack
     local ret = redis.call("sadd", name, unpack(ARGV, 2))
     redis.call("expire", name, expire_time)
+    return ret
+    """
+
+    # 移除并返回list中的前几个元素
+    lpoptrim_script = """
+    local name = KEYS[1]
+    local num = ARGV[1]
+    local ret = redis.call("lrange", name, 0, num-1)
+    redis.call("ltrim", name, num, -1)
+    return ret
+    """
+
+    # 移除并返回list中的最后几个元素
+    rpoptrim_script = """
+    local name = KEYS[1]
+    local num = ARGV[1]
+    local ret = redis.call("lrange", name, -num, -1)
+    redis.call("ltrim", name, 0, -num-1)
     return ret
     """
 
@@ -85,18 +106,36 @@ class _ARedis(StrictRedis):
         """
         return await self.eval(self.saddex_script, 1, name, ex, *values)
 
-    async def lpushtrim(self, name, *values, length=DEFAULT_REDIS_QUEUE_SIZE):
+    async def lpushtrim(self, name, *values, length=DEFAULT_REDIS_QUEUE_SIZE) -> int:
+        """
+        向list中插入元素并只保留指定数量的元素
+        """
         return await self.eval(
             self.lpushtrim_script, 1, name, 0, length - 1, *values
         )
 
     async def zaddrembyrank(self, name, mapping, length=DEFAULT_REDIS_QUEUE_SIZE):
+        """
+        向zset中加入元素并只保留指定数量的元素
+        """
         list_mapping = list()
         for k, v in mapping.items():
             list_mapping.extend([v, k])
         return await self.eval(
             self.zaddrembyrank_script, 1, name, 0, -(length + 1), *list_mapping
         )
+
+    async def lpoptrim(self, name, num: int = 1) -> List[str]:
+        """
+        移除并返回list中的前几个元素
+        """
+        return await self.eval(self.lpoptrim_script, 1, name, num)
+
+    async def rpoptrim(self, name, num: int = 1) -> List[str]:
+        """
+        移除并返回list中的最后几个元素
+        """
+        return (await self.eval(self.rpoptrim_script, 1, name, num))[::-1]
 
     async def subscribe(self, *args, ignore_subscribe_messages=False, **kwargs):
         """
