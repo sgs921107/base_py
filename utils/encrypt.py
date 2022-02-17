@@ -4,16 +4,17 @@
 Author: xiangcai
 Date: 2021-12-03 10:39:21
 LastEditors: xiangcai
-LastEditTime: 2022-02-10 19:10:38
+LastEditTime: 2022-02-17 17:42:02
 Description: file content
 '''
-from re import compile
+import re
 from typing import Union
 from base64 import b64encode, b64decode
 
+from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
 from binascii import a2b_hex, b2a_hex
-from Crypto.Cipher import PKCS1_v1_5, AES
 
 from common.conts import UTF8
 
@@ -21,20 +22,21 @@ PAD_ZERO = 1
 PAD_PKCS7 = 2
 
 
-def padding_zero(data: str, block_size=16):
-    return data + (block_size - len(data) % block_size) * chr(0)
+def padding_zero(content: bytes, block_size=16) -> bytes:
+    return content + (block_size - len(content) % block_size) * chr(0).encode()
 
 
-def unpadding_zero(data: str):
-    return data.rstrip("0")
+def unpadding_zero(content: bytes) -> bytes:
+    return content.rstrip(chr(0).encode())
 
 
-def padding_pkcs7(data: str, block_size=16):
-    return data + (block_size - len(data) % block_size) * chr(block_size - len(data) % block_size)
+def padding_pkcs7(content: bytes, block_size=16) -> bytes:
+    padding_size = block_size - len(content) % block_size
+    return content + padding_size * chr(padding_size).encode()
 
 
-def unpadding_pkcs7(data: str):
-    return data[:-ord(data[-1])]
+def unpadding_pkcs7(content: bytes) -> bytes:
+    return content[:-ord(chr(content[-1]))]
 
 
 class EncryptAES(object):
@@ -50,17 +52,14 @@ class EncryptAES(object):
     }
 
     def __init__(
-        # 密钥
-        self, key: str,
-        # 偏移量
-        iv: Union[str, None] = None,
+        self,
+        cipher,
         # 填充方式
         pad_type: int = PAD_PKCS7,
         block_size: int = 16,
         encoding=UTF8
     ):
-        self.key = key.encode(encoding)
-        self.iv = iv and iv.encode(encoding) or None
+        self.cipher = cipher
         self.pad_type = pad_type
         self.encoding = encoding
         self.block_size = block_size
@@ -79,46 +78,63 @@ class EncryptAES(object):
             raise ValueError("pad type must in %s, have %s" % (self.pad_funcs.keys(), self.pad_type))
         return func
 
-    def encrypt_ecb(self, text: str) -> str:
+    def encrypt(self, text: str) -> str:
         # 字符串补位
-        text = self.pad_func(text, self.block_size)
-        cipher = AES.new(self.key, AES.MODE_ECB)
+        content = self.pad_func(text.encode(self.encoding), self.block_size)
         # 加密
-        result = cipher.encrypt(text.encode(self.encoding))
+        result = self.cipher.encrypt(content)
         # 将密文使用Base64进行编码后转为字符串类型
         return b64encode(result).decode(self.encoding)
 
-    def decrypt_ecb(self, content: str) -> str:
-        # 实例化aes
-        cipher = AES.new(self.key, AES.MODE_ECB)
+    def decrypt(self, text: str) -> str:
         # 解密
-        data = cipher.decrypt(b64decode(content)).decode(self.encoding)
+        content = self.cipher.decrypt(b64decode(text))
         # 清除填充
-        return self.unpad_func(data)
+        return self.unpad_func(content).decode(self.encoding)
 
-    def encrypt_cbc(self, text: str) -> str:
-        # 字符串补位
-        text = self.pad_func(text, self.block_size)
-        cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        # 加密
-        result = cipher.encrypt(text.encode(self.encoding))
-        # 将密文使用Base64进行编码后转为字符串类型
-        return b64encode(result).decode(self.encoding)
+    @classmethod
+    def ecb_instance(
+        cls,
+        key: str,
+        pad_type: int = PAD_PKCS7,
+        block_size: int = 16,
+        encoding: str = UTF8
+    ):
+        return cls(
+            AES.new(key.encode(encoding), mode=1),
+            pad_type=pad_type,
+            block_size=block_size,
+            encoding=encoding
+        )
 
-    def decrypt_cbc(self, content: str) -> str:
-        # 实例化aes
-        cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        # 解密
-        data = cipher.decrypt(b64decode(content)).decode(self.encoding)
-        # 清除填充
-        return self.unpad_func(data)
+    @classmethod
+    def cbc_instance(
+        cls,
+        key: str,
+        iv: str,
+        pad_type: int = PAD_PKCS7,
+        block_size: int = 16,
+        encoding: str = UTF8
+    ):
+        # 同一实例只能做加密或解密
+        return cls(
+            AES.new(key.encode(encoding), mode=2, IV=iv.encode(encoding)),
+            pad_type=pad_type,
+            block_size=block_size,
+            encoding=encoding
+        )
 
 
 class EncryptRSA(object):
-    key_compile = compile(r'^(-----[a-zA-Z\s]+-----)\n*([a-zA-Z\d\n\+\=\/]+)\n*(-----[a-zA-Z\s]+-----)$')
+    key_compile = re.compile(r'^\s*(-----[a-zA-Z\s]+-----)\n*([a-zA-Z\d\s\n\+\=\/]+)\n*(-----[a-zA-Z\s]+-----)\s*$')
 
-    def __init__(self, cipher) -> None:
+    def __init__(
+        self,
+        cipher,
+        encoding: str = UTF8
+    ) -> None:
         self.cipher = cipher
+        self.encoding = encoding
 
     @classmethod
     def format_key(cls, rsa_key: str):
@@ -126,40 +142,38 @@ class EncryptRSA(object):
         格式化rsa_key
         如果是pem格式的key则添加换行符
         """
-        if not rsa_key.startswith("-----"):
-            return rsa_key
         match_result = cls.key_compile.match(rsa_key)
         if match_result is None:
             return rsa_key
         return "\n".join(match_result.groups())
 
-    def b64_encrypt(self, text: str, encoding: str = UTF8) -> str:
+    def b64_encrypt(self, text: str) -> str:
         """
         加密后返回base64
         """
-        cipher_content = self.cipher.encrypt(text.encode(encoding))
-        return b64encode(cipher_content).decode(encoding)
+        cipher_content = self.cipher.encrypt(text.encode(self.encoding))
+        return b64encode(cipher_content).decode(self.encoding)
 
-    def b64_decrypt(self, cipher_text: str, encoding: str = UTF8) -> Union[str, None]:
+    def b64_decrypt(self, cipher_text: str) -> Union[str, None]:
         """
         解密base64密文
         """
-        content = self.cipher.decrypt(cipher_text.encode(encoding), None)
-        return content and b64decode(content) or None
+        content = self.cipher.decrypt(b64decode(cipher_text), None)
+        return content and content.decode(self.encoding) or None
 
-    def hex_encrypt(self, text: str, encoding: str = UTF8) -> str:
+    def hex_encrypt(self, text: str) -> str:
         """
         加密后返回16进制字符串
         """
-        cipher_content = self.cipher.encrypt(text.encode(encoding))
-        return b2a_hex(cipher_content).decode(encoding)
+        cipher_content = self.cipher.encrypt(text.encode(self.encoding))
+        return b2a_hex(cipher_content).decode(self.encoding)
 
-    def hex_decrypt(self, cipher_text: str, encoding: str = UTF8) -> Union[str, None]:
+    def hex_decrypt(self, cipher_text: str) -> Union[str, None]:
         """
         解密16进制密文
         """
-        content = self.cipher.decrypt(cipher_text.encode(encoding), None)
-        return content and a2b_hex(content).decode(encoding) or None
+        content = self.cipher.decrypt(a2b_hex(cipher_text), None)
+        return content and content.decode(self.encoding) or None
 
     @classmethod
     def from_key(cls, externKey: str, passphrase: str = None):
@@ -175,10 +189,4 @@ class EncryptRSA(object):
 
 
 if __name__ == '__main__':
-    rsa_key = "-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5gsH+AA4XWONB5TDcUd+xCz7ejOFHZKlcZDx+pF1i7Gsvi1vjyJoQhRtRSn950x498VUkx7rUxg1/ScBVfrRxQOZ8xFBye3pjAzfb22+RCuYApSVpJ3OO3KsEuKExftz9oFBv3ejxPlYc5yq7YiBO8XlTnQN0Sa4R4qhPO3I2MQIDAQAB-----END PUBLIC KEY-----"
-    pubkey_rsa = EncryptRSA.from_key(rsa_key)
-    print(pubkey_rsa.b64_encrypt("1234456"))
-    modules = "00C1E3934D1614465B33053E7F48EE4EC87B14B95EF88947713D25EECBFF7E74C7977D02DC1D9451F79DD5D1C10C29ACB6A9B4D6FB7D0A0279B6719E1772565F09AF627715919221AEF91899CAE08C0D686D748B20A3603BE2318CA6BC2B59706592A9219D0BF05C9F65023A21D2330807252AE0066D59CEEFA5F2748EA80BAB81"
-    e = "10001"
-    pubkey_rsa1 = EncryptRSA.from_construct((int(modules, base=16), int(e, base=16)))
-    print(pubkey_rsa1.hex_encrypt("598af7e714e274b5"))
+    pass

@@ -135,7 +135,9 @@ class _ARedis(StrictRedis):
         """
         移除并返回list中的最后几个元素
         """
-        return (await self.eval(self.rpoptrim_script, 1, name, num))[::-1]
+        result = await self.eval(self.rpoptrim_script, 1, name, num)
+        result.reverse()
+        return result
 
     async def subscribe(self, *args, ignore_subscribe_messages=False, **kwargs):
         """
