@@ -9,24 +9,21 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: ${IMAGE_NAME}:latest
+        image: ${COMPOSE_IMAGE_NAME}:latest
         container_name: demo
         hostname: demo
         volumes:
             # 项目目录
-            - ..:${PROJECT_DIR}:ro
+            - ..:${COMPOSE_PROJECT_DIR}:ro
+            # 项目日志目录
+            - ${HOST_LOG_DIR}:${COMPOSE_LOG_DIR}:rw
             # crontab配置
             - ../configs/crontab.ini:/var/spool/cron/root:ro
             # 日志轮转配置
             - ../configs/logrotate_conf:/etc/logrotate.d/logrotate_conf:ro
-            # 项目配置文件目录
-            - ${HOST_CONF_DIR}:${PROJECT_ENV}:rw
-            # 项目日志目录
-            - ${HOST_LOG_DIR}:${LOG_DIR}:rw
-        working_dir: ${PROJECT_DIR}/bin
-        environment:
-            PROJECT_DIR: ${PROJECT_DIR}
-            PROJECT_ENV: ${PROJECT_ENV}
+            # 项目部署目录 容器内使用sed命令修改.env时需要可写权限创建临时文件
+            - .:${COMPOSE_PROJECT_DIR}/deploy:rw
+        working_dir: ${COMPOSE_PROJECT_DIR}/bin
         privileged: true
         command:
             - /bin/bash
