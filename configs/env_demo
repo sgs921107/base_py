@@ -6,6 +6,16 @@ HOST_LOG_DIR=/var/log/base_pyp
 # docker仓库地址
 HOST_DOCKER_REPOSITORY=
 
+# [COMPOSE]
+# 避免多个项目网络配置冲突
+COMPOSE_PROJECT_NAME=base_pyp
+# 镜像名字
+COMPOSE_IMAGE_NAME=base_pyp
+# 容器内的项目目录
+COMPOSE_PROJECT_DIR=/projects/base_pyp
+# 容器内的日志目录
+COMPOSE_LOG_DIR=/var/log/base_pyp
+
 # [redis]
 # 项目使用的redis key的前缀 example: pyp -> pyp:redis_key
 redis_prefix=pyp

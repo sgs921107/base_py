@@ -252,6 +252,10 @@ class EnvManage(object):
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    from importlib import import_module
+
+    import_module("__init__")
+    from common.conts import ENV_PATH
 
     desc = "envs manager"
     parser = ArgumentParser(description=desc)
@@ -265,7 +269,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--delete", type=str, help="删除一个env")
     parser.add_argument("-a", "--add", type=str,
                         help="追加一个env,接收三个参数section、name、value,将追加一个section_name=value的env", nargs=3)
-    parser.add_argument("-p", "--path", type=str, default=os.getenv("PROJECT_ENV") or "", help="env文件的路径")
+    parser.add_argument("-p", "--path", type=str, default=ENV_PATH, help="env文件的路径")
     args = parser.parse_args()
     env_path = args.path
     env_manager = EnvManage(env_path)

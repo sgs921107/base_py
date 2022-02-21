@@ -53,8 +53,7 @@ class Config(BaseModel):
         加载env然后返回一个config实例
         """
         if not path.isfile(env_path):
-            cur_dir = path.dirname(path.realpath(__file__))
-            env_path = path.realpath(r"%s/../configs/env_demo" % cur_dir)
+            raise ValueError("%s no exist or not a file" % env_path)
         env_manager = DotEnv(
             dotenv_path=env_path, verbose=True, encoding=encoding
         )

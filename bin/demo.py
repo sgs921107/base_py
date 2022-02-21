@@ -4,17 +4,17 @@
 Description: demo
 '''
 if __name__ == '__main__':
-    # 可恶的not used提示
     # import __init__
     from importlib import import_module
     import_module("__init__")
+from common import logger
 from common.pool import SignalHandler
 
 
 async def main():
     handler = SignalHandler()
     while handler.exit is False:
-        print("this is a demo")
+        logger.info("this is a demo")
         await handler.asleep(1)
 
 

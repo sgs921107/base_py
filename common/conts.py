@@ -5,6 +5,7 @@ import time
 import socket
 import platform
 from datetime import timedelta
+from os.path import realpath, dirname
 
 # 日期格式
 LAYOUT_ISO = "%Y-%m-%d %H:%M"
@@ -45,7 +46,7 @@ LATIN1 = "latin-1"
 UTF8 = "utf-8"
 
 # env配置文件的路径
-ENV_PATH = "/projects/.env"
+ENV_PATH = "%s/deploy/.env" % dirname(dirname(realpath(__file__)))
 
 # 日志
 DEFAULT_LOG_FORMAT = "%(asctime)s - pid:%(process)d - %(filename)s [line: %(lineno)d] [%(levelname)s] ----- %(message)s"

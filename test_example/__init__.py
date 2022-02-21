@@ -3,7 +3,7 @@
 import os
 import sys
 
-cur_dir = os.path.dirname(os.path.abspath(__file__))
-project_dir = os.path.dirname(cur_dir)
-sys.path.insert(0, cur_dir)
-sys.path.insert(0, project_dir)
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(CUR_DIR)
+sys.path.insert(0, PROJECT_DIR)
+sys.path.insert(0, CUR_DIR)
