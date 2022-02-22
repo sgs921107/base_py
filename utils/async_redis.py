@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding=utf8 -*-
-from typing import List
+from typing import List, Union
+from dataclasses import dataclass
 
 from aredis import StrictRedis, StrictRedisCluster
 
@@ -9,7 +10,7 @@ from common.conts import DEFAULT_REDIS_EXPIRES, \
     DEFAULT_REDIS_PARAMS, DEFAULT_REDIS_QUEUE_SIZE
 
 
-class _ARedis(StrictRedis):
+class ScriptsCommandMixin:
 
     hsetex_script = """
     local name = KEYS[1]
@@ -139,6 +140,14 @@ class _ARedis(StrictRedis):
         result.reverse()
         return result
 
+
+class PubSubCommandExtension:
+
+    @dataclass
+    class MessageType:
+        message: str = "message"
+        subscribe: str = "subscribe"
+
     async def subscribe(self, *args, ignore_subscribe_messages=False, **kwargs):
         """
         订阅一个/多个频道
@@ -152,16 +161,22 @@ class _ARedis(StrictRedis):
         return pubsub
 
 
-class _ARedisCluster(StrictRedisCluster, _ARedis):
-    """
-    """
+mixins = [ScriptsCommandMixin, PubSubCommandExtension]
+
+
+class _ARedis(StrictRedis, *mixins):
+    pass
+
+
+class _ARedisCluster(StrictRedisCluster, *mixins):
+    pass
 
 
 class ARedis(object):
     instance = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls) -> Union[_ARedis, _ARedisCluster]:
         if cls.instance is None:
             params = DEFAULT_REDIS_PARAMS.copy()
             params["host"] = config.get("redis_host")
