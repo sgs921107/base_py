@@ -11,14 +11,14 @@
 
 ## 部署
 > 1.手动clone代码并切换至目标分支或标签  
-> 2.根据configs/env_demo生成并配置env文件/etc/base_py/.env  
-> 3.root用户运行: source /etc/base_py/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
+> 2.根据configs/env_demo生成并配置env文件/etc/py_framework/.env  
+> 3.root用户运行: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
 
 ## docker容器服务说明
 1. demo: this is a demo
 
 ## 运维
-进入项目部署目录: source /etc/base_py/.env && cd $HOST_PROJECT_DIR/deploy  
+进入项目部署目录: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy  
 > 配置查看: docker-compose run --rm demo python env_manager.py -l  
 > 执行迁移: docker-compose run --rm demo python db_manager.py upgrade head  
 > 单元测试: docker-compose run --rm demo sh unit_test.sh  

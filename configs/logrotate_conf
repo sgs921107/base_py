@@ -1,4 +1,4 @@
-/var/log/base_py/demo1.log
+/var/log/py_framework/demo1.log
 {
     missingok
     daily

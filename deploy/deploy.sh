@@ -4,17 +4,17 @@
 ### 
 
 ########################### 注意事项 ############################
-# todo 替换所有base_py为项目名称
+# todo 替换所有py_framework为项目名称
 # 1.手动clone代码并切换至目标分支或标签
-# 2.根据configs/env_demo生成并配置env文件/etc/base_py/.env
-# 3.root用户运行: source /etc/base_py/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
+# 2.根据configs/env_demo生成并配置env文件/etc/py_framework/.env
+# 3.root用户运行: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
 ################################################################
 
 echo "====================== begin deploy ========================="
 
 # -----------------------------------------------------------------
 # 宿主机的env配置文件所在的目录
-HOST_ENV_PATH=/etc/base_py/.env
+HOST_ENV_PATH=/etc/py_framework/.env
 
 source $HOST_ENV_PATH
 
