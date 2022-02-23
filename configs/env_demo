@@ -1,24 +1,24 @@
 # [HOST]
 # 宿主机项目目录
-HOST_PROJECT_DIR=/data/base_pyp
+HOST_PROJECT_DIR=/data/base_py
 # 宿主机项目日志文件目录
-HOST_LOG_DIR=/var/log/base_pyp
+HOST_LOG_DIR=/var/log/base_py
 # docker仓库地址
 HOST_DOCKER_REPOSITORY=
 
 # [COMPOSE]
 # 避免多个项目网络配置冲突
-COMPOSE_PROJECT_NAME=base_pyp
+COMPOSE_PROJECT_NAME=base_py
 # 镜像名字
-COMPOSE_IMAGE_NAME=base_pyp
+COMPOSE_IMAGE_NAME=base_py
 # 容器内的项目目录
-COMPOSE_PROJECT_DIR=/projects/base_pyp
+COMPOSE_PROJECT_DIR=/projects/base_py
 # 容器内的日志目录
-COMPOSE_LOG_DIR=/var/log/base_pyp
+COMPOSE_LOG_DIR=/var/log/base_py
 
 # [redis]
-# 项目使用的redis key的前缀 example: pyp -> pyp:redis_key
-redis_prefix=pyp
+# 项目使用的redis key的前缀 example: bpy -> bpy:redis_key
+redis_prefix=bpy
 redis_host=127.0.0.1
 redis_port=6379
 # redis模式 1: cluster(集群) 2: ""(单机)
@@ -29,8 +29,8 @@ redis_db=0
 redis_password=
 
 # [mysql]
-# 项目创建表的前缀 example: pyp -> pyp_table_name
-mysql_prefix=pyp
+# 项目创建表的前缀 example: bpy -> bpy_table_name
+mysql_prefix=bpy
 mysql_host=127.0.0.1
 mysql_port=3306
 mysql_user=root

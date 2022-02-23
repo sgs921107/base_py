@@ -29,12 +29,12 @@ services:
             - /bin/bash
             - -c
             - |
-                /bin/bash run.sh &
+                /bin/bash run.sh
                 /usr/sbin/init
         logging:
             driver: json-file
             options:
-                max-size: 200m
+                max-size: 100m
                 max-file: "3"
         restart: always
         networks:
