@@ -25,7 +25,6 @@ class ScriptsCommandMixin:
     hmsetex_script = """
     local name = KEYS[1]
     local expire_time = ARGV[1]
-    local unpack = unpack or table.unpack
     local ret = redis.call("hmset", name, unpack(ARGV, 2))
     redis.call("expire", name, expire_time)
     return ret
@@ -36,7 +35,6 @@ class ScriptsCommandMixin:
     local name = KEYS[1]
     local startNum = ARGV[1]
     local stopNum = ARGV[2]
-    local unpack = unpack or table.unpack
     local ret = redis.call("zadd", name, unpack(ARGV, 3))
     redis.call("zremrangebyrank", name, startNum, stopNum)
     return ret
@@ -47,7 +45,6 @@ class ScriptsCommandMixin:
     local name = KEYS[1]
     local startNum = ARGV[1]
     local stopNum = ARGV[2]
-    local unpack = unpack or table.unpack
     local ret = redis.call("lpush", name, unpack(ARGV, 3))
     if( ret > stopNum + 1 )
     then
@@ -59,7 +56,6 @@ class ScriptsCommandMixin:
     saddex_script = """
     local name = KEYS[1]
     local expire_time = ARGV[1]
-    local unpack = unpack or table.unpack
     local ret = redis.call("sadd", name, unpack(ARGV, 2))
     redis.call("expire", name, expire_time)
     return ret
@@ -80,6 +76,17 @@ class ScriptsCommandMixin:
     local num = ARGV[1]
     local ret = redis.call("lrange", name, -num, -1)
     redis.call("ltrim", name, 0, -num-1)
+    return ret
+    """
+
+    spoprem_script = """
+    local name = KEYS[1]
+    local num = ARGV[1]
+    local ret = redis.call("srandmember", name, num)
+    if next(ret) ~= nil
+    then
+        redis.call("srem", name, unpack(ret))
+    end
     return ret
     """
 
@@ -139,6 +146,12 @@ class ScriptsCommandMixin:
         result = await self.eval(self.rpoptrim_script, 1, name, num)
         result.reverse()
         return result
+
+    async def spoprem(self, name, num: int = 1) -> List:
+        """
+        随机移除并返回若干个元素
+        """
+        return await self.eval(self.spoprem_script, 1, name, num)
 
 
 class PubSubCommandExtension:

@@ -4,7 +4,7 @@
 Author: xiangcai
 Date: 2022-02-16 11:18:56
 LastEditors: xiangcai
-LastEditTime: 2022-02-22 19:59:36
+LastEditTime: 2022-02-25 18:12:49
 Description: file content
 '''
 import pytest
@@ -74,6 +74,27 @@ class TestRedis(object):
             message = base_message % i
             await redis_cli.publish(channel, message)
         await sub_task
+
+    @pytest.mark.asyncio
+    async def test_spoprem(self, redis_cli):
+        # 测试的set name
+        key = "test_set_sccan"
+        await redis_cli.delete(key)
+        size = 10
+        # 测试数据
+        data = {str(num) for num in range(size)}
+        # 将测试数据添加至redis集合
+        await redis_cli.saddex(key, *data)
+        have_num = size // 2
+        # 随机取出一半数据
+        have_data = await redis_cli.spoprem(key, have_num)
+        assert len(have_data) == have_num, "want len(have_data) == %s, have %d" % (have_num, len(have_data))
+        remaining_num = size - have_num
+        # redis中剩余的元素
+        remaining_data = await redis_cli.smembers(key)
+        assert len(remaining_data) == remaining_num, "want len(remaining_data) == %d, have %d" % (remaining_num, len(remaining_data))
+        assert data == remaining_data | set(have_data), "want have_data | remaining_data == %s, have %s" % (data, have_data + remaining_data)
+        await redis_cli.delete(key)
 
 
 if __name__ == '__main__':

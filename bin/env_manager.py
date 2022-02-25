@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding=utf8 -*-
 import re
-import os
 import json
 import subprocess
 from dotenv.main import DotEnv
@@ -10,8 +9,7 @@ from dotenv.main import DotEnv
 class EnvManage(object):
 
     def __init__(self, env_path):
-        if os.path.isfile(env_path) is False:
-            raise ValueError("env path '%s' is not a file" % env_path)
+        # 对临时文件进行操作 然后覆盖至env_path
         self.env_path = env_path
         self.envs = self.read_envs()
         blank_line_regex = r"^\s*$"
@@ -20,9 +18,15 @@ class EnvManage(object):
         self.annotation_line_regexp = re.compile(annotation_line_regex)
 
     def read_envs(self):
+        # if os.path.isfile(env_path) is False:
+        #     raise ValueError("env path '%s' is not a file" % self.real_env_path)
         manager = DotEnv(self.env_path)
         envs = manager.dict()
         return envs
+
+    @staticmethod
+    def equal(value1, value2):
+        return str(value1).upper() == str(value2).upper()
 
     def show_sections(self):
         sections = set()
@@ -56,9 +60,9 @@ class EnvManage(object):
     def search_env(self, name):
         value = self.envs.get(name)
         if value is None:
-            print("env文件中未包含配置项：%s" % name)
+            print("env %s not exist" % name)
         else:
-            print("%s的当前值为: '%s'" % (name, value))
+            print("env %s cur value: '%s'" % (name, value))
         return value
 
     def add_section(self, section, check=True):
@@ -206,9 +210,9 @@ class EnvManage(object):
         subprocess.call(cmd, shell=True)
         # 判断是否追加成功
         new_envs = self.read_envs()
-        value = new_envs.get(name)
-        if value is not None:
-            print("add env %s succeed, value is '%s'" % (name, value))
+        cur_value = new_envs.get(name)
+        if cur_value == value:
+            print("add env %s succeed, value is '%s'" % (name, cur_value))
             return True
         else:
             print("add env %s failed" % name)
@@ -224,38 +228,37 @@ class EnvManage(object):
         ret = False
         exist = self.search_env(name)
         if exist is None:
-            print("修改失败, 该方法不支持新增配置项")
+            print("update env %s failed: env not found" % name)
         elif exist == value:
-            print("不需要修改,配置项%s要修改的值%s跟原来的值%s是一致的" % (name, value, exist))
+            print("env %s not need update, this value %s same as ori value %s" % (name, value, exist))
+            ret = True
         else:
-            print("开始修改配置")
             cmd = 'sed -i "/^%s=/c%s=%s" %s' % (name, name, value, self.env_path)
             output = subprocess.getoutput(cmd)
             new_envs = self.read_envs()
-            value = new_envs.get(name)
-            if value is not None and output == '':
-                print("修改配置%s成功, 修改后的值为: '%s'" % (name, value))
+            cur_value = new_envs.get(name)
+            if cur_value == value and output == '':
+                print("update env %s succeed, cur value: '%s'" % (name, cur_value))
                 # 如果是修改的进程数配置,则设置进程数
                 if name.startswith("circus_") and name.endswith("_num"):
                     server = name.replace("circus_", "").replace("_num", "")
-                    cmd = 'circusctl set %s numprocesses %s' % (server, value)
+                    cmd = 'circusctl set %s numprocesses %s' % (server, cur_value)
                     set_ret = subprocess.getoutput(cmd)
                     if "error" not in set_ret:
-                        print('设置服务%s的进程数为%s成功' % (server, value))
+                        print('set numprocesses of circus watcher %s to %s succeed' % (server, cur_value))
                     else:
-                        print('设置服务%s的进程数为%s失败: %s' % (server, value, set_ret))
+                        print('set numprocesses of circus watcher %s to %s failed: %s' % (server, cur_value, set_ret))
                 ret = True
             else:
-                print("修改配置%s失败: %s" % (name, output))
+                print("update env %s failed: %s" % (name, output))
         return ret
 
 
 if __name__ == '__main__':
+    from os.path import realpath, dirname
     from argparse import ArgumentParser
-    from importlib import import_module
 
-    import_module("__init__")
-    from common.conts import ENV_PATH
+    DEFAULT_ENV_PATH = "%s/deploy/.env" % dirname(dirname(realpath(__file__)))
 
     desc = "envs manager"
     parser = ArgumentParser(description=desc)
@@ -269,7 +272,7 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--delete", type=str, help="删除一个env")
     parser.add_argument("-a", "--add", type=str,
                         help="追加一个env,接收三个参数section、name、value,将追加一个section_name=value的env", nargs=3)
-    parser.add_argument("-p", "--path", type=str, default=ENV_PATH, help="env文件的路径")
+    parser.add_argument("-p", "--path", type=str, default=DEFAULT_ENV_PATH, help="env文件的路径")
     args = parser.parse_args()
     env_path = args.path
     env_manager = EnvManage(env_path)

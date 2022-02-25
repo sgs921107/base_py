@@ -36,7 +36,6 @@ sh $DOCKER_INSTALLER || { echo "部署失败: 安装docker服务失败,请检查
 # 将项目env配置链接至deploy/.env
 cp -f $HOST_ENV_PATH $COMPOSE_ENV_PATH && ln -sf $COMPOSE_ENV_PATH $HOST_ENV_PATH
 
-
 # 拉取镜像
 # 检查是否配置了docker仓库
 if [ "$HOST_DOCKER_REPOSITORY" != "" ]

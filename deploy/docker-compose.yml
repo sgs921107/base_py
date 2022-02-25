@@ -25,6 +25,8 @@ services:
             - .:${COMPOSE_PROJECT_DIR}/deploy:rw
         working_dir: ${COMPOSE_PROJECT_DIR}/bin
         privileged: true
+        # environment:
+        #     - COMPOSE_PROJECT_DIR=${COMPOSE_PROJECT_DIR}
         command:
             - /bin/bash
             - -c

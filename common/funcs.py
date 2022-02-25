@@ -162,6 +162,20 @@ def now_datetime(timezone=DEFAULT_TIMEZONE):
     return now + timedelta(hours=timezone)
 
 
+def file_md5(filepath: str) -> str:
+    """
+    对文件内容进行MD5签名
+    """
+    ret = ""
+    with open(filepath) as f:
+        while True:
+            content = f.read(1024)
+            if not content:
+                break
+            ret = encrypt_md5(ret + content)
+    return ret
+
+
 def timeit(func):
     def wrapper(*args, **kwargs):
         st = time.time()
