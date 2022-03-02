@@ -21,8 +21,6 @@ services:
             - ../configs/crontab.ini:/var/spool/cron/root:ro
             # 日志轮转配置
             - ../configs/logrotate_conf:/etc/logrotate.d/logrotate_conf:ro
-            # 项目部署目录 容器内使用sed命令修改.env时需要可写权限创建临时文件
-            - .:${COMPOSE_PROJECT_DIR}/deploy:rw
         working_dir: ${COMPOSE_PROJECT_DIR}/bin
         privileged: true
         # environment:

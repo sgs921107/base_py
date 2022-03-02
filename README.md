@@ -19,7 +19,10 @@
 
 ## 运维
 进入项目部署目录: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy  
-> 配置查看: docker-compose run --rm demo python env_manager.py -l  
+> 查看配置: ./envm -l  
+> 修改配置: ./envm -u name value  
+> 添加配置: ./envm -a section name value  
+> 删除配置: ./envm -d name  
 > 执行迁移: docker-compose run --rm demo python db_manager.py upgrade head  
 > 单元测试: docker-compose run --rm demo sh unit_test.sh  
 > 启动服务: docker-compose up [-d]  
