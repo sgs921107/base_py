@@ -4,7 +4,7 @@
 Author: xiangcai
 Date: 2021-09-06 17:38:27
 LastEditors: xiangcai
-LastEditTime: 2022-01-27 11:10:37
+LastEditTime: 2022-03-07 18:38:56
 Description: file content
 '''
 import json
@@ -132,39 +132,6 @@ class BaseModel(Base):
             data[name] = value
         return data
 
-    async def select_by_id(self):
-        """
-        根据id查询数据
-        """
-        if not self.id:
-            logger.error("data id not found: %s" % self.dict())
-            return dict()
-        # 缓存中没有则从db查询
-        async with DB.get_session() as session:
-            result = await session.execute(
-                select(self.output_columns()).where(
-                    self.__class__.id == self.id
-                ).limit(1)
-            )
-            return self.row_to_dict(result.first())
-
-    async def update_by_id(self, data):
-        """
-        根据id更新数据
-        return 影响的行数
-        """
-        if not self.id:
-            logger.error("data id not found: %s" % self.dict())
-            return 0
-        async with DB.get_session() as session:
-            async with session.begin():
-                result = await session.execute(
-                    update(self.__table__).values(data).where(
-                        self.__class__.id == self.id
-                        # False - 不对session进行同步，直接进行delete or update操作。
-                    ).execution_options(synchronize_session=False))
-                return result.rowcount
-
     async def insert(self):
         """
         将数据插入db
@@ -202,6 +169,20 @@ class BaseModel(Base):
         return AsyncPaginator(stmt, page, size)
 
     @classmethod
+    async def select_by_id(cls, _id):
+        """
+        根据id查询数据
+        """
+        # 缓存中没有则从db查询
+        async with DB.get_session() as session:
+            result = await session.execute(
+                select(cls.output_columns()).where(
+                    cls.id == _id
+                ).limit(1)
+            )
+            return cls.row_to_dict(result.first())
+
+    @classmethod
     async def update(
         cls,
         values: Dict,
@@ -218,6 +199,21 @@ class BaseModel(Base):
                 stmt.execution_options(synchronize_session="fetch")
             )
             return result.rowcount
+
+    @classmethod
+    async def update_by_id(cls, _id, data):
+        """
+        根据id更新数据
+        return 影响的行数
+        """
+        async with DB.get_session() as session:
+            async with session.begin():
+                result = await session.execute(
+                    update(cls.__table__).values(data).where(
+                        cls.id == _id
+                        # False - 不对session进行同步，直接进行delete or update操作。
+                    ).execution_options(synchronize_session=False))
+                return result.rowcount
 
     @classmethod
     async def delete(
