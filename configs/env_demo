@@ -19,8 +19,8 @@ COMPOSE_PROJECT_DIR=/projects/py_framework
 COMPOSE_LOG_DIR=/var/log/py_framework
 
 # [redis]
-# 项目使用的redis key的前缀 example: pfw -> pfw:redis_key
-redis_prefix=pfw
+# 项目使用的redis key的前缀 example: pf -> pf:redis_key
+redis_prefix=pf
 redis_host=127.0.0.1
 redis_port=6379
 # redis模式 1: cluster(集群) 2: ""(单机)
@@ -31,8 +31,8 @@ redis_db=0
 redis_password=
 
 # [mysql]
-# 项目创建表的前缀 example: pfw -> pfw_table_name
-mysql_prefix=pfw
+# 项目创建表的前缀 example: pf -> pf_table_name
+mysql_prefix=pf
 mysql_host=127.0.0.1
 mysql_port=3306
 mysql_user=root

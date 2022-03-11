@@ -10,8 +10,8 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        container_name: demo
-        hostname: demo
+        container_name: pf_demo
+        hostname: pf_demo
         volumes:
             # 项目目录
             - ..:${COMPOSE_PROJECT_DIR}:ro
@@ -36,15 +36,15 @@ services:
                 max-file: "3"
         restart: always
         networks:
-            - py3
+            - pf
 
     web:
         build:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        container_name: web
-        hostname: web
+        container_name: pf_web
+        hostname: pf_web
         volumes:
             # 项目目录
             - ..:${COMPOSE_PROJECT_DIR}:ro
@@ -55,7 +55,7 @@ services:
         # environment:
         #     - COMPOSE_PROJECT_DIR=${COMPOSE_PROJECT_DIR}
         ports:
-            - ${HOST_WEB_PORT:-8000}:8000/tcp
+            - ${HOST_WEB_PORT}:8000/tcp
         command:
             - /bin/bash
             - -c
@@ -69,10 +69,31 @@ services:
                 max-file: "3"
         restart: always
         networks:
-            - py3
+            - pf
 
+    # nginx:
+    #     image: nginx:latest
+    #     container_name: pf_nginx
+    #     hostname: pf_nginx
+    #     volumes:
+    #         - ${HOST_LOG_DIR}/nginx:/var/log/nginx:rw
+    #         - ${HOST_NGINX_DIR}/conf.d:/etc/nginx/conf.d:rw
+    #         - ${HOST_NGINX_DIR}/www:/var/www:ro
+    #     ports:
+    #         - ${HOST_NGINX_HTTP_PORT:-80}:80/tcp
+    #         - ${HOST_NGINX_HTTPS_PORT:-443}:443/tcp
+    #     logging:
+    #         driver: json-file
+    #         options:
+    #             max-size: 100m
+    #             max-file: "3"
+    #     restart: always
+    #     depends_on:
+    #         - web
+    #     networks:
+    #         - pf
 
 networks:
-    py3:
+    pf:
         ipam:
             driver: default

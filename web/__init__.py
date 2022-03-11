@@ -4,7 +4,7 @@
 Author: xiangcai
 Date: 2022-03-10 10:03:25
 LastEditors: xiangcai
-LastEditTime: 2022-03-10 18:03:45
+LastEditTime: 2022-03-11 20:26:10
 Description: file content
 '''
 import os
@@ -62,7 +62,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# 挂载静态服务器
+# 挂载静态服务器demo 应交由nginx处理
 cur_dir = os.path.dirname(os.path.realpath(__file__))
 static_path = os.path.join(cur_dir, "static")
 app.mount("/static", StaticFiles(directory=static_path, check_dir=True))

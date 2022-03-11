@@ -15,7 +15,7 @@ from common.conts import DEFAULT_LOG_FORMAT, ENV_PATH, \
 class Config(BaseModel):
     # redis
     # 项目使用的redis key的前缀
-    redis_prefix: str = "pyp"
+    redis_prefix: str = "pf"
     redis_host: str = "127.0.0.1"
     redis_port: int = 6379
     redis_mode: str = ""
@@ -23,7 +23,7 @@ class Config(BaseModel):
     redis_password: str = ""
 
     # mysql
-    mysql_prefix: str = "pyp"
+    mysql_prefix: str = "pf"
     mysql_host: str = "127.0.0.1"
     mysql_port: int = 3006
     mysql_user: str = "root"
