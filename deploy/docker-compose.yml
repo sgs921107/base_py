@@ -18,18 +18,49 @@ services:
             # 项目日志目录
             - ${HOST_LOG_DIR}:${COMPOSE_LOG_DIR}:rw
             # crontab配置
-            - ../configs/crontab.ini:/var/spool/cron/root:ro
+            - ../configs/crontab_demo.ini:/var/spool/cron/root:ro
             # 日志轮转配置
-            - ../configs/logrotate_conf:/etc/logrotate.d/logrotate_conf:ro
+            - ../configs/logrotate_demo:/etc/logrotate.d/logrotate_conf:ro
         working_dir: ${COMPOSE_PROJECT_DIR}/bin
         privileged: true
-        # environment:
-        #     - COMPOSE_PROJECT_DIR=${COMPOSE_PROJECT_DIR}
         command:
             - /bin/bash
             - -c
             - |
-                /bin/bash run.sh
+                /bin/bash run_demo.sh
+                /usr/sbin/init
+        logging:
+            driver: json-file
+            options:
+                max-size: 100m
+                max-file: "3"
+        restart: always
+        networks:
+            - py3
+
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: ${COMPOSE_IMAGE_NAME}:latest
+        container_name: web
+        hostname: web
+        volumes:
+            # 项目目录
+            - ..:${COMPOSE_PROJECT_DIR}:ro
+            # 项目日志目录
+            - ${HOST_LOG_DIR}:${COMPOSE_LOG_DIR}:rw
+        working_dir: ${COMPOSE_PROJECT_DIR}/bin
+        privileged: true
+        # environment:
+        #     - COMPOSE_PROJECT_DIR=${COMPOSE_PROJECT_DIR}
+        ports:
+            - ${HOST_WEB_PORT:-8000}:8000/tcp
+        command:
+            - /bin/bash
+            - -c
+            - |
+                /bin/bash run_web.sh
                 /usr/sbin/init
         logging:
             driver: json-file

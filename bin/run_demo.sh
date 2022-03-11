@@ -3,4 +3,4 @@
  # @Description: 启动脚本
 ### 
 
-circusd ../configs/circus.ini &
+circusd ../configs/circus_demo.ini &

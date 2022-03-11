@@ -34,7 +34,7 @@ cd $DEPLOY_DIR || { echo "部署失败: 进入项目部署目录失败, 请校�
 sh $DOCKER_INSTALLER || { echo "部署失败: 安装docker服务失败,请检查是否缺少依赖并重新运行部署脚本"; exit 1; }
 
 # 将项目env配置链接至deploy/.env
-ln -sf $HOST_ENV_PATH $COMPOSE_ENV_PATH
+ln -f $HOST_ENV_PATH $COMPOSE_ENV_PATH
 
 # 拉取镜像
 # 检查是否配置了docker仓库

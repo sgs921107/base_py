@@ -5,6 +5,8 @@ HOST_PROJECT_DIR=/data/py_framework
 HOST_LOG_DIR=/var/log/py_framework
 # docker仓库地址
 HOST_DOCKER_REPOSITORY=
+# 宿主机web端口
+HOST_WEB_PORT=8000
 
 # [COMPOSE]
 # 避免多个项目网络配置冲突
