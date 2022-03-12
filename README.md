@@ -12,7 +12,8 @@
 ## 部署
 > 1.手动clone代码并切换至目标分支或标签  
 > 2.根据configs/env_demo生成并配置env文件/etc/py_framework/.env  
-> 3.root用户运行: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
+> 3.根据configs/nginx生成自己的nginx配置目录/etc/py_framework/nginx  
+> 4.root用户运行: source /etc/py_framework/.env && cd $HOST_PROJECT_DIR/deploy && sh deploy.sh
 
 ## docker容器服务说明
 1. demo: this is a demo

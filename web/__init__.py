@@ -4,14 +4,14 @@
 Author: xiangcai
 Date: 2022-03-10 10:03:25
 LastEditors: xiangcai
-LastEditTime: 2022-03-11 20:26:10
+LastEditTime: 2022-03-12 20:22:05
 Description: file content
 '''
-import os
+# import os
 
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
+# from fastapi.staticfiles import StaticFiles
+# from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
@@ -63,14 +63,14 @@ app.add_middleware(
 )
 
 # 挂载静态服务器demo 应交由nginx处理
-cur_dir = os.path.dirname(os.path.realpath(__file__))
-static_path = os.path.join(cur_dir, "static")
-app.mount("/static", StaticFiles(directory=static_path, check_dir=True))
-
-
-@app.get("/")
-async def index():
-    return RedirectResponse("/static/html/index.html")
+# cur_dir = os.path.dirname(os.path.realpath(__file__))
+# static_path = os.path.join(cur_dir, "static")
+# app.mount("/static", StaticFiles(directory=static_path, check_dir=True))
+#
+#
+# @app.get("/")
+# async def index():
+#     return RedirectResponse("/static/html/index.html")
 
 
 app.include_router(api_router, prefix="/api")

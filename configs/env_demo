@@ -7,6 +7,12 @@ HOST_LOG_DIR=/var/log/py_framework
 HOST_DOCKER_REPOSITORY=
 # 宿主机web端口
 HOST_WEB_PORT=8000
+# 宿主机nginx配置目录
+HOST_NGINX_DIR=/etc/py_framework/nginx
+# 宿主机nginx http端口
+HOST_NGINX_HTTP_PORT=80
+# 宿主机nginx https端口
+HOST_NGINX_HTTPS_PORT=443
 
 # [COMPOSE]
 # 避免多个项目网络配置冲突
