@@ -7,8 +7,6 @@
 FROM centos:7.6.1810
 # 指定作者信息
 LABEL maintaniner="yiming"
-# 配置pip源
-COPY ./pip.conf /root/.pip/pip.conf
 RUN set -ex \
     # 预安装所需组件
     && yum install -y epel-release \
@@ -28,9 +26,13 @@ RUN set -ex \
 # 支持中文
 RUN set -ex \
     &&yum install -y kde-l10n-Chinese \
-    && yum clean all && rm -rf /var/cache/yum/* && rm -rf /tmp/*
-RUN localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
+    && yum clean all && rm -rf /var/cache/yum/* && rm -rf /tmp/* \
+    && localedef -c -f UTF-8 -i zh_CN zh_CN.utf8
 ENV LC_ALL=zh_CN.UTF-8 LAN=zh_CN.UTF-8G
+
+# 系统调优
+RUN set -ex \
+    && echo "net.core.somaxconn = 10240" >> /etc/sysctl.conf
 
 # 配置rsyslog 配置当未使用所有权限启动容器时仍可以收集日志
 RUN set -ex \
@@ -39,6 +41,8 @@ RUN set -ex \
     && sed -i 's/^$OmitLocalLogging on/$OmitLocalLogging off/' /etc/rsyslog.conf \
     && sed -i 's/^$IMJournalStateFile imjournal.state/# $IMJournalStateFile imjournal.state/' /etc/rsyslog.conf
  
+# 配置pip源
+COPY ./pip.conf /root/.pip/pip.conf
 # 配置python3环境
 RUN set -ex \
     && yum install -y python-devel python-pip python3-devel python3-3.6.8 \
