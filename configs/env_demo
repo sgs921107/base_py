@@ -19,10 +19,6 @@ HOST_NGINX_HTTPS_PORT=443
 COMPOSE_PROJECT_NAME=py_framework
 # 镜像名字
 COMPOSE_IMAGE_NAME=py_framework
-# 容器内的项目目录
-COMPOSE_PROJECT_DIR=/projects/py_framework
-# 容器内的日志目录
-COMPOSE_LOG_DIR=/var/log/py_framework
 
 # [redis]
 # 项目使用的redis key的前缀 example: pf -> pf:redis_key
