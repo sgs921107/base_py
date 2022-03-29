@@ -67,11 +67,11 @@ then
     fi
 fi
 # 开始拉取镜像, 如果拉取失败则直接构建
-docker pull $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest \
-    && docker tag $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest $IMAGE_NAME:latest \
+docker pull $HOST_DOCKER_REPOSITORY/$COMEPOSE_IMAGE_NAME:latest \
+    && docker tag $HOST_DOCKER_REPOSITORY/$COMEPOSE_IMAGE_NAME:latest $IMAGE_NAME:latest \
     || { \
         echo "拉取镜像失败, 开始构建镜像"; docker-compose build \
-        && echo "构建镜像完成, 请手动上传镜像: docker tag $IMAGE_NAME:latest $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest && docker push $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest" \
+        && echo "构建镜像完成, 请手动上传镜像: docker tag $COMEPOSE_IMAGE_NAME:latest $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest && docker push $HOST_DOCKER_REPOSITORY/$IMAGE_NAME:latest" \
         || { \
             echo "部署失败: 构建镜像失败"; exit 1; \
         }; 

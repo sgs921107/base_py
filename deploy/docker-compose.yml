@@ -14,14 +14,14 @@ services:
         hostname: pf_demo
         volumes:
             # 项目目录
-            - ..:${COMPOSE_PROJECT_DIR}:ro
+            - ..:/projects/py_framework:ro
             # 项目日志目录
-            - ${HOST_LOG_DIR}:${COMPOSE_LOG_DIR}:rw
+            - ${HOST_LOG_DIR}:/var/log/py_framework:rw
             # crontab配置
             - ../configs/crontab_demo.ini:/var/spool/cron/root:ro
             # 日志轮转配置
             - ../configs/logrotate_demo:/etc/logrotate.d/logrotate_conf:ro
-        working_dir: ${COMPOSE_PROJECT_DIR}/bin
+        working_dir: /projects/py_framework/bin
         privileged: true
         command:
             - /bin/bash
@@ -47,13 +47,11 @@ services:
         hostname: pf_web
         volumes:
             # 项目目录
-            - ..:${COMPOSE_PROJECT_DIR}:ro
+            - ..:/projects/py_framework:ro
             # 项目日志目录
-            - ${HOST_LOG_DIR}:${COMPOSE_LOG_DIR}:rw
-        working_dir: ${COMPOSE_PROJECT_DIR}/bin
+            - ${HOST_LOG_DIR}:/var/log/py_framework:rw
+        working_dir: /projects/py_framework/bin
         privileged: true
-        # environment:
-        #     - COMPOSE_PROJECT_DIR=${COMPOSE_PROJECT_DIR}
         ports:
             - ${HOST_WEB_PORT}:8000/tcp
         command:
