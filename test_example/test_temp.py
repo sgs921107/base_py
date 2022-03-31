@@ -6,7 +6,7 @@ Description: file content
 import pytest
 
 
-class TestNami(object):
+class TestTemp(object):
 
     @pytest.mark.asyncio
     async def test_sync(self):

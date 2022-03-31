@@ -3,6 +3,7 @@
 
 import json
 import time
+from typing import Union
 from hashlib import md5, sha256, sha1
 from datetime import datetime, timedelta
 from zlib import compress as zcompress, decompress as zdecompress
@@ -14,71 +15,90 @@ from common.conts import DEFAULT_TIMEZONE, UTF8, LATIN1, \
 
 
 def zlib(
-    text: str,
+    text: Union[str, bytes],
     encoding: str = UTF8,
     level: int = DEFAULT_COMPRESS_LEVEL
 ) -> str:
     """
     zlib压缩
     """
-    return zcompress(text.encode(encoding), level).decode(LATIN1)
+    return zcompress(
+        text.encode(encoding) if isinstance(text, str) else text,
+        level
+    ).decode(LATIN1)
 
 
 def unzlib(
-    text: str,
+    text: Union[str, bytes],
     encoding: str = UTF8,
 ) -> str:
     """
     zlib解压
     """
-    return zdecompress(text.encode(LATIN1)).decode(encoding)
+    return zdecompress(
+        text.encode(LATIN1) if isinstance(text, str) else text
+    ).decode(encoding)
 
 
 def gzip(
-    text: str,
+    text: Union[str, bytes],
     encoding: str = UTF8,
     level: int = DEFAULT_COMPRESS_LEVEL
 ) -> str:
     """
     gzip压缩
     """
-    return gcompress(text.encode(encoding), level).decode(LATIN1)
+    return gcompress(
+        text.encode(encoding) if isinstance(text, str) else text,
+        level
+    ).decode(LATIN1)
 
 
 def ungzip(
-    text: str,
+    text: Union[str, bytes],
     encoding: str = UTF8,
 ) -> str:
     """
     gzip解压
     """
-    return gdecompress(text.encode(LATIN1)).decode(encoding)
+    return gdecompress(
+        text.encode(LATIN1) if isinstance(text, str) else text
+    ).decode(encoding)
 
 
-def encrypt_md5(text: str, encoding: str = UTF8) -> str:
+def encrypt_md5(
+    text: Union[str, bytes],
+    encoding: str = UTF8
+) -> str:
     """
     md5加密
     """
     m = md5()
-    m.update(text.encode(encoding))
+    m.update(text.encode(encoding) if isinstance(text, str) else text)
     return m.hexdigest()
 
 
-def encrypt_sha1(text: str, encoding: str = UTF8) -> str:
+def encrypt_sha1(
+    text: Union[str, bytes],
+    encoding: str = UTF8
+) -> str:
     """
     sha1加密
     """
     sha = sha1()
-    sha.update(text.encode(encoding))
+    sha.update(text.encode(encoding) if isinstance(text, str) else text)
     return sha.hexdigest()
 
 
-def encrypt_sha256(text: str, encoding: str = UTF8) -> str:
+def encrypt_sha256(
+    text: Union[str, bytes],
+    encoding: str = UTF8
+) -> str:
     """
     sha256加密
     """
     sha = sha256()
-    sha.update(text.encode(encoding))
+    sha.update(text.encode(encoding) if isinstance(text, str) else text)
     return sha.hexdigest()
 
 

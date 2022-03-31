@@ -95,13 +95,16 @@ class EncryptAES(object):
     @classmethod
     def ecb_instance(
         cls,
-        key: str,
+        key: Union[str, bytes],
         pad_type: int = PAD_PKCS7,
         block_size: int = 16,
         encoding: str = UTF8
     ):
         return cls(
-            AES.new(key.encode(encoding), mode=1),
+            AES.new(
+                key.encode(encoding) if isinstance(key, str) else key,
+                mode=1
+            ),
             pad_type=pad_type,
             block_size=block_size,
             encoding=encoding
@@ -110,15 +113,19 @@ class EncryptAES(object):
     @classmethod
     def cbc_instance(
         cls,
-        key: str,
-        iv: str,
+        key: Union[str, bytes],
+        iv: Union[str, bytes],
         pad_type: int = PAD_PKCS7,
         block_size: int = 16,
         encoding: str = UTF8
     ):
         # 同一实例只能做加密或解密
         return cls(
-            AES.new(key.encode(encoding), mode=2, IV=iv.encode(encoding)),
+            AES.new(
+                key.encode(encoding) if isinstance(key, str) else key,
+                mode=2,
+                IV=iv.encode(encoding) if isinstance(iv, str) else iv,
+            ),
             pad_type=pad_type,
             block_size=block_size,
             encoding=encoding

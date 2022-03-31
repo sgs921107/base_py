@@ -77,17 +77,23 @@ class AsyncPool(SignalHandler):
         """
         self.tasks.remove(task)
 
-    async def handler(self, func, *args, **kwargs):
+    async def handler(self, coro_or_future):
         async with self.sem:
-            await func(*args, **kwargs)
+            await coro_or_future
 
-    def sync(self, func, *args, **kwargs):
+    def sync(self, coro_or_future, callback=None):
         if self._join:
             raise("AsyncPool Joined")
-        task = asyncio.ensure_future(self.handler(func, *args, **kwargs))
+        task = asyncio.ensure_future(self.handler(coro_or_future))
+        if callback is not None:
+            task.add_done_callback(callback)
         self.tasks.add(task)
         task.add_done_callback(self.done_callback)
         return task
+
+    def map(self, func, iterable, callback=None):
+        tasks = list()
+        return [self.sync(func(param), callback=callback) for param in iterable]
 
     async def wait(self):
         # 等待所有数据存储完毕
@@ -96,5 +102,11 @@ class AsyncPool(SignalHandler):
 
     async def join(self):
         self._join = True
-        await asyncio.sleep(1)
         await self.wait()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, exc_trace):
+        await self.join()
+
