@@ -75,13 +75,14 @@ services:
         hostname: pf_nginx
         volumes:
             - ${HOST_LOG_DIR}/nginx:/var/log/nginx:rw
-            - ${HOST_NGINX_DIR}/conf.d:/etc/nginx/conf.d:ro
+            - ${HOST_NGINX_DIR}/conf.d:/etc/nginx/conf.d:rw
             - ${HOST_NGINX_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro
             - ${HOST_NGINX_DIR}/ssl:/etc/nginx/ssl:ro
             - ${HOST_NGINX_DIR}/www:/var/www:ro
         ports:
             - ${HOST_NGINX_HTTP_PORT:-80}:80/tcp
             - ${HOST_NGINX_HTTPS_PORT:-443}:443/tcp
+        privileged: true
         logging:
             driver: json-file
             options:
