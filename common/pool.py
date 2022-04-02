@@ -92,7 +92,6 @@ class AsyncPool(SignalHandler):
         return task
 
     def map(self, func, iterable, callback=None):
-        tasks = list()
         return [self.sync(func(param), callback=callback) for param in iterable]
 
     async def wait(self):
@@ -109,4 +108,3 @@ class AsyncPool(SignalHandler):
 
     async def __aexit__(self, exc_type, exc_value, exc_trace):
         await self.join()
-
