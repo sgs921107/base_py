@@ -20,6 +20,12 @@ COMPOSE_PROJECT_NAME=py_framework
 # 镜像名字
 COMPOSE_IMAGE_NAME=py_framework
 
+# [SERVICE]
+# 需要启动的服务 1(启动)/其它(不启动)
+SERVICE_DEMO=1
+SERVICE_WEB=1
+SERVICE_NGINX=1
+
 # [redis]
 # 项目使用的redis key的前缀 example: pf -> pf:redis_key
 redis_prefix=pf

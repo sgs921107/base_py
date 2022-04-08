@@ -83,15 +83,22 @@ then
     docker rmi $none_imgs
 fi
 
+# 初始化命令
 # 执行迁移
 # docker-compose run --rm demo python db_manager.py upgrade head
 
 # 执行单元测试
 
 # 启动服务
-docker-compose up -d
-sleep 3
-echo "服务启动日志:"
-docker-compose logs --tail 10
+for service in demo web nginx
+do
+    switch=`echo service_$service | tr a-z A-Z`
+    if [ "$(eval echo \$$switch)" == "1" ]
+    then
+        docker-compose up -d $service \
+        && { echo "启动"$service"服务成功"; docker-compose logs  --tail 10 $service; } \
+        || echo "启动服务"$service"失败!!!"
+    fi
+done
 
 echo "====================== deploy done ========================="
