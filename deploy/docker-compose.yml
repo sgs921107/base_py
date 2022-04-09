@@ -10,7 +10,7 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        hostname: pf_demo
+        hostname: demo
         volumes:
             # 项目目录
             - ..:/projects/py_framework:ro
@@ -40,7 +40,7 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        hostname: pf_web
+        hostname: web
         volumes:
             # 项目目录
             - ..:/projects/py_framework:ro
@@ -67,7 +67,7 @@ services:
 
     nginx:
         image: nginx:latest
-        hostname: pf_nginx
+        hostname: nginx
         volumes:
             - ${HOST_LOG_DIR}/nginx:/var/log/nginx:rw
             - ${HOST_NGINX_DIR}/conf.d:/etc/nginx/conf.d:rw
@@ -94,7 +94,7 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        hostname: pf_logrotate
+        hostname: logrotate
         volumes:
             # 日志目录
             - ${HOST_LOG_DIR}:/logs:rw

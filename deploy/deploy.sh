@@ -97,7 +97,7 @@ do
     if [ "$scale" != "0" ]
     then
         docker-compose up --scale $service=$scale -d $service \
-        && { echo "启动"$service"服务成功"; docker-compose logs  --tail 10 $service; } \
+        && { sleep 2; echo "启动"$service"服务成功"; docker-compose logs  --tail 10 $service; } \
         || echo "启动服务"$service"失败!!!"
     fi
 done
