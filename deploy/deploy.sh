@@ -90,12 +90,13 @@ fi
 # 执行单元测试
 
 # 启动服务
-for service in demo web nginx
+for service in demo web nginx logrotate
 do
-    switch=`echo service_$service | tr a-z A-Z`
-    if [ "$(eval echo \$$switch)" == "1" ]
+    scale_name=`echo service_"$service"_scale | tr a-z A-Z`
+    scale=$(eval echo \$$scale_name)
+    if [ "$scale" != "0" ]
     then
-        docker-compose up -d $service \
+        docker-compose up --scale $service=$scale -d $service \
         && { echo "启动"$service"服务成功"; docker-compose logs  --tail 10 $service; } \
         || echo "启动服务"$service"失败!!!"
     fi

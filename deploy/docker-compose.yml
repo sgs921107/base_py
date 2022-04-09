@@ -10,17 +10,14 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        container_name: pf_demo
         hostname: pf_demo
         volumes:
             # 项目目录
             - ..:/projects/py_framework:ro
             # 项目日志目录
-            - ${HOST_LOG_DIR}:/var/log/py_framework:rw
+            - ${HOST_LOG_DIR}/demo:/var/log/demo:rw
             # crontab配置
             - ../configs/crontab_demo.ini:/var/spool/cron/root:ro
-            # 日志轮转配置
-            - ../configs/logrotate_demo:/etc/logrotate.d/logrotate_conf:ro
         working_dir: /projects/py_framework/bin
         privileged: true
         command:
@@ -43,13 +40,12 @@ services:
             context: .
             dockerfile: Dockerfile
         image: ${COMPOSE_IMAGE_NAME}:latest
-        container_name: pf_web
         hostname: pf_web
         volumes:
             # 项目目录
             - ..:/projects/py_framework:ro
             # 项目日志目录
-            - ${HOST_LOG_DIR}:/var/log/py_framework:rw
+            - ${HOST_LOG_DIR}/web:/var/log/web:rw
         working_dir: /projects/py_framework/bin
         privileged: true
         ports:
@@ -71,7 +67,6 @@ services:
 
     nginx:
         image: nginx:latest
-        container_name: pf_nginx
         hostname: pf_nginx
         volumes:
             - ${HOST_LOG_DIR}/nginx:/var/log/nginx:rw
@@ -91,6 +86,35 @@ services:
         restart: always
         depends_on:
             - web
+        networks:
+            - pf
+
+    logrotate:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: ${COMPOSE_IMAGE_NAME}:latest
+        hostname: pf_logrotate
+        volumes:
+            # 日志目录
+            - ${HOST_LOG_DIR}:/logs:rw
+            # demo服务日志轮转配置
+            - ../configs/logrotate_demo:/etc/logrotate.d/domo:ro
+            # nginx服务日志轮转配置
+            - ../configs/logrotate_demo:/etc/logrotate.d/nginx:ro
+        working_dir: /logs
+        privileged: true
+        command:
+            - /bin/bash
+            - -c
+            - |
+                /usr/sbin/init
+        logging:
+            driver: json-file
+            options:
+                max-size: 100m
+                max-file: "3"
+        restart: always
         networks:
             - pf
 

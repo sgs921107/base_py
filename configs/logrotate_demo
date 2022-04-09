@@ -1,7 +1,7 @@
-/var/log/py_framework/demo1.log
+/logs/demo/demo1.log
 {
-    missingok
     daily
+    missingok
     copytruncate
     rotate 2
     notifempty
