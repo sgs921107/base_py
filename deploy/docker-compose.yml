@@ -33,7 +33,7 @@ services:
                 max-file: "3"
         restart: always
         networks:
-            - pf
+            - front
 
     web:
         build:
@@ -63,7 +63,7 @@ services:
                 max-file: "3"
         restart: always
         networks:
-            - pf
+            - front
 
     nginx:
         image: nginx:latest
@@ -87,7 +87,7 @@ services:
         depends_on:
             - web
         networks:
-            - pf
+            - front
 
     logrotate:
         build:
@@ -116,9 +116,9 @@ services:
                 max-file: "3"
         restart: always
         networks:
-            - pf
+            - front
 
 networks:
-    pf:
+    front:
         ipam:
             driver: default
