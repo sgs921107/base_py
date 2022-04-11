@@ -101,7 +101,7 @@ services:
             # demo服务日志轮转配置
             - ../configs/logrotate_demo:/etc/logrotate.d/domo:ro
             # nginx服务日志轮转配置
-            - ../configs/logrotate_demo:/etc/logrotate.d/nginx:ro
+            - ../configs/logrotate_nginx:/etc/logrotate.d/nginx:ro
         working_dir: /logs
         privileged: true
         command:
