@@ -62,7 +62,7 @@ class AutoReload(SignalHandler):
                     should_reload = False
             else:
                 nones = 0
-                if 'IN_MODIFY' in event[1]:
+                if 'IN_CLOSE_WRITE' in event[1]:
                     logger.info('file modified: %s' % event[-2])
                     should_reload = True
             await self.asleep(0.01)
