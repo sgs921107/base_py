@@ -30,6 +30,25 @@ class ScriptsCommandMixin:
     return ret
     """
 
+    saddex_script = """
+    local name = KEYS[1]
+    local expire_time = ARGV[1]
+    local ret = redis.call("sadd", name, unpack(ARGV, 2))
+    redis.call("expire", name, expire_time)
+    return ret
+    """
+
+    spoprem_script = """
+    local name = KEYS[1]
+    local num = ARGV[1]
+    local ret = redis.call("srandmember", name, num)
+    if next(ret) ~= nil
+    then
+        redis.call("srem", name, unpack(ret))
+    end
+    return ret
+    """
+
     # 向zset中加入元素并只保留指定数量的元素
     zaddrembyrank_script = """
     local name = KEYS[1]
@@ -53,10 +72,22 @@ class ScriptsCommandMixin:
     return ret
     """
 
-    saddex_script = """
+    # 从list左端插入数据并设置过期时间
+    lpushex_script = """
     local name = KEYS[1]
     local expire_time = ARGV[1]
-    local ret = redis.call("sadd", name, unpack(ARGV, 2))
+    local unpack = unpack or table.unpack
+    local ret = redis.call("lpush", name, unpack(ARGV, 2))
+    redis.call("expire", name, expire_time)
+    return ret
+    """
+
+    # 从list右端插入数据并设置过期时间
+    rpushex_script = """
+    local name = KEYS[1]
+    local expire_time = ARGV[1]
+    local unpack = unpack or table.unpack
+    local ret = redis.call("rpush", name, unpack(ARGV, 2))
     redis.call("expire", name, expire_time)
     return ret
     """
@@ -76,17 +107,6 @@ class ScriptsCommandMixin:
     local num = ARGV[1]
     local ret = redis.call("lrange", name, -num, -1)
     redis.call("ltrim", name, 0, -num-1)
-    return ret
-    """
-
-    spoprem_script = """
-    local name = KEYS[1]
-    local num = ARGV[1]
-    local ret = redis.call("srandmember", name, num)
-    if next(ret) ~= nil
-    then
-        redis.call("srem", name, unpack(ret))
-    end
     return ret
     """
 
@@ -152,6 +172,12 @@ class ScriptsCommandMixin:
         随机移除并返回若干个元素
         """
         return await self.eval(self.spoprem_script, 1, name, num)
+
+    async def lpushex(self, name, *values, ex=DEFAULT_REDIS_EXPIRES):
+        return await self.eval(self.lpushex_script, 1, name, ex, *values)
+
+    async def rpushex(self, name, *values, ex=DEFAULT_REDIS_EXPIRES):
+        return await self.eval(self.rpushex_script, 1, name, ex, *values)
 
 
 class PubSubCommandExtension:
