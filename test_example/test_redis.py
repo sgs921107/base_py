@@ -4,7 +4,7 @@
 Author: xiangcai
 Date: 2022-02-16 11:18:56
 LastEditors: xiangcai
-LastEditTime: 2022-02-25 18:12:49
+LastEditTime: 2022-04-15 17:04:02
 Description: file content
 '''
 import pytest
@@ -95,6 +95,39 @@ class TestRedis(object):
         assert len(remaining_data) == remaining_num, "want len(remaining_data) == %d, have %d" % (remaining_num, len(remaining_data))
         assert data == remaining_data | set(have_data), "want have_data | remaining_data == %s, have %s" % (data, have_data + remaining_data)
         await redis_cli.delete(key)
+
+    @pytest.mark.asyncio
+    async def test_lpushex(self, redis_cli):
+        ex = 10
+        name = "test_list_lpushex"
+        await redis_cli.delete(name)
+        data = [str(num) for num in range(10)]
+        # 插入数据
+        count = await redis_cli.lpushex(name, *data, ex=ex)
+        assert count == len(data), "want count == %d, have %d" % (count, len(data))
+        # 后去所有数据
+        have = await redis_cli.lrange(name, 0, -1)
+        want = data[::-1]
+        assert have == want, "want %s, have %s" % (want, have)
+        # 获取过期时间
+        have_ex = await redis_cli.ttl(name)
+        assert have_ex <= ex, "want have_ex <= %d, have %d" % (ex, have_ex)
+
+    @pytest.mark.asyncio
+    async def test_rpushex(self, redis_cli):
+        ex = 10
+        name = "test_list_rpushex"
+        await redis_cli.delete(name)
+        data = [str(num) for num in range(10)]
+        # 插入数据
+        count = await redis_cli.rpushex(name, *data, ex=ex)
+        assert count == len(data), "want count == %d, have %d" % (count, len(data))
+        # 后去所有数据
+        have = await redis_cli.lrange(name, 0, -1)
+        assert have == data, "want %s, have %s" % (data, have)
+        # 获取过期时间
+        have_ex = await redis_cli.ttl(name)
+        assert have_ex <= ex, "want have_ex <= %d, have %d" % (ex, have_ex)
 
 
 if __name__ == '__main__':
