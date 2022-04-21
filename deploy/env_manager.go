@@ -2,7 +2,7 @@
  * @Author: xiangcai
  * @Date: 2022-02-28 10:00:08
  * @LastEditors: xiangcai
- * @LastEditTime: 2022-03-02 16:30:33
+ * @LastEditTime: 2022-04-21 14:02:51
  * @Description: env manager
  * 	macos需安装配置gnu-sed兼容sed命令
  */
@@ -24,11 +24,6 @@ import (
 	"strings"
 
 	"github.com/sgs921107/gcommon"
-)
-
-var (
-	circusPrefix = "circus_"
-	circusSuffix = "_num"
 )
 
 func printf(format string, a ...interface{}) {
@@ -203,18 +198,6 @@ func (m EnvManager) update(name, value string) bool {
 				return false
 			}
 			printf("update env %s succeed, cur value: '%s'", name, curVal)
-			// 如果是circus管理的watcher进程数配置, 则设置进程数
-			if strings.HasPrefix(name, circusPrefix) && strings.HasSuffix(name, circusSuffix) {
-				watcher := strings.TrimSuffix(strings.TrimPrefix(name, circusPrefix), circusSuffix)
-				circusCmd := fmt.Sprintf("circusctl set %s numprocesses %s", watcher, curVal)
-				if output, err := execShell(circusCmd); err != nil {
-					printf("set numprocesses of circus watcher %s to %s error: %s", watcher, curVal, err.Error())
-				} else if strings.Contains(string(output), "error") {
-					printf("set numprocesses of circus watcher %s to %s failed: %s", watcher, curVal, string(output))
-				} else {
-					printf("set numprocesses of circus watcher %s to %s succeed", watcher, curVal)
-				}
-			}
 			return true
 		}
 	}
