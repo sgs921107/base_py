@@ -92,24 +92,6 @@ class ScriptsCommandMixin:
     return ret
     """
 
-    # 移除并返回list中的前几个元素
-    lpoptrim_script = """
-    local name = KEYS[1]
-    local num = ARGV[1]
-    local ret = redis.call("lrange", name, 0, num-1)
-    redis.call("ltrim", name, num, -1)
-    return ret
-    """
-
-    # 移除并返回list中的最后几个元素
-    rpoptrim_script = """
-    local name = KEYS[1]
-    local num = ARGV[1]
-    local ret = redis.call("lrange", name, -num, -1)
-    redis.call("ltrim", name, 0, -num-1)
-    return ret
-    """
-
     async def hsetex(self, name, key, value, ex=DEFAULT_REDIS_EXPIRES):
         return await self.eval(self.hsetex_script, 1, name, ex, key, value)
 
@@ -152,20 +134,6 @@ class ScriptsCommandMixin:
         return await self.eval(
             self.zaddrembyrank_script, 1, name, 0, -(length + 1), *list_mapping
         )
-
-    async def lpoptrim(self, name, num: int = 1) -> List[str]:
-        """
-        移除并返回list中的前几个元素
-        """
-        return await self.eval(self.lpoptrim_script, 1, name, num)
-
-    async def rpoptrim(self, name, num: int = 1) -> List[str]:
-        """
-        移除并返回list中的最后几个元素
-        """
-        result = await self.eval(self.rpoptrim_script, 1, name, num)
-        result.reverse()
-        return result
 
     async def spoprem(self, name, num: int = 1) -> List:
         """

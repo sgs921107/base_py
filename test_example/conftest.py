@@ -30,6 +30,7 @@ def redis_cli():
 def event_loop():
     loop = asyncio.get_event_loop()
     yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")
@@ -38,12 +39,12 @@ def db():
     yield instance
 
 
-@pytest.fixture(scope="function")
-@pytest.mark.asyncio
-async def db_session():
-    session = DB.get_session()
-    yield session
-    await session.close()
+# @pytest.fixture(scope="function")
+# @pytest.mark.asyncio
+# async def db_session():
+#     session = DB.get_session()
+#     yield session
+#     await session.close()
 
 
 @pytest.fixture(scope="session")

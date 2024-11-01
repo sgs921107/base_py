@@ -1,6 +1,6 @@
 # [HOST]
 # 宿主机项目目录
-HOST_PROJECT_DIR=/data/py_framework
+HOST_PROJECT_DIR=/app/py_framework
 # 宿主机项目日志文件目录
 HOST_LOG_DIR=/var/log/py_framework
 # docker仓库地址
@@ -37,15 +37,13 @@ redis_mode=
 # redis db num集群模式则忽略
 redis_db=0
 # redis服务的密码
-redis_password=
+redis_password=online
 
 # [mysql]
-# 项目创建表的前缀 example: pf -> pf_table_name
-mysql_prefix=pf
 mysql_host=127.0.0.1
 mysql_port=3306
-mysql_user=root
-mysql_password=123456
+mysql_user=work
+mysql_password=online
 mysql_db=test_db
 mysql_charset=utf8mb4
 # mysql连接池的最大连接数
@@ -54,8 +52,8 @@ mysql_pool_size=30
 # [rabbitmq]
 rabbitmq_host=127.0.0.1
 rabbitmq_port=5672
-rabbitmq_username=test
-rabbitmq_password=123456
+rabbitmq_username=work
+rabbitmq_password=online
 rabbitmq_vhost=
 rabbitmq_heartbeat=10
 

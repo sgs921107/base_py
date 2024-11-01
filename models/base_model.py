@@ -39,15 +39,6 @@ Base.metadata.naming_convention = immutabledict({"ix": "ix_%(column_0_name)s"})
 redis_cli = ARedis.get_instance()
 
 
-def real_table(name: str) -> str:
-    """
-    格式化表名
-    """
-    if config.mysql_prefix.endswith("_"):
-        return config.mysql_prefix + name
-    return "_".join([config.mysql_prefix, name])
-
-
 class BaseModel(Base):
     __abstract__ = True
     __table_args__ = {

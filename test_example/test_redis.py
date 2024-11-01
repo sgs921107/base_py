@@ -14,40 +14,6 @@ import asyncio
 class TestRedis(object):
 
     @pytest.mark.asyncio
-    async def test_lpoptrim(self, redis_cli):
-        name = "test_list_lpoptrim"
-        num = 10
-        await redis_cli.delete(name)
-        # [0, 1, 2, ..., 19]
-        await redis_cli.lpush(name, *list(range(num * 2))[::-1])
-        # ["0", "1", "2", ..., "9"]
-        lpop_want = [str(num) for num in range(num)]
-        lpop_have = await redis_cli.lpoptrim(name, num)
-        assert lpop_have == lpop_want, "lpop_want %s, have %s" % (lpop_want, lpop_have)
-        # ["10", "11", "12", ..., "19"]
-        remaining_want = [str(num) for num in range(num, num * 2)]
-        remaining_have = await redis_cli.lrange(name, 0, -1)
-        assert remaining_have == remaining_want, "remaining want %s, have %s" % (remaining_want, remaining_have)
-        await redis_cli.delete(name)
-
-    @pytest.mark.asyncio
-    async def test_rpoptrim(self, redis_cli):
-        name = "test_list_rpoptrim"
-        num = 10
-        await redis_cli.delete(name)
-        # [19, 18, 17, ..., 0]
-        await redis_cli.lpush(name, *list(range(num * 2)))
-        # ["0", "1", "2", ..., "9"]
-        lpop_want = [str(num) for num in range(num)]
-        lpop_have = await redis_cli.rpoptrim(name, num)
-        assert lpop_have == lpop_want, "lpop_want %s, have %s" % (lpop_want, lpop_have)
-        # ["19", "18", "17", ..., "10"]
-        remaining_want = [str(num - 1) for num in range(num * 2, num, -1)]
-        remaining_have = await redis_cli.lrange(name, 0, -1)
-        assert remaining_have == remaining_want, "remaining want %s, have %s" % (remaining_want, remaining_have)
-        await redis_cli.delete(name)
-
-    @pytest.mark.asyncio
     async def test_pubsub(self, redis_cli):
         channel = "test_channel"
         num = 5

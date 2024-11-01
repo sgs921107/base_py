@@ -7,13 +7,11 @@ if __name__ == '__main__':
 import asyncio
 import subprocess
 
-from inotify.adapters import Inotify
+from inotify.adapters import Inotify # type: ignore
 
 from common import logger
 from common.conts import ENV_PATH
 from common.pool import SignalHandler
-
-logger.setLevel("INFO")
 
 
 class AutoReload(SignalHandler):
@@ -60,12 +58,12 @@ class AutoReload(SignalHandler):
                 if nones >= self.nones:
                     self.should_reload = True
                     should_reload = False
+                await self.asleep(0.01)
             else:
                 nones = 0
                 if 'IN_CLOSE_WRITE' in event[1]:
                     logger.info('file modified: %s' % event[-2])
                     should_reload = True
-            await self.asleep(0.01)
 
     async def run(self):
         await asyncio.gather(

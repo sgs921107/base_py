@@ -23,7 +23,6 @@ class Config(BaseModel):
     redis_password: str = ""
 
     # mysql
-    mysql_prefix: str = "pf"
     mysql_host: str = "127.0.0.1"
     mysql_port: int = 3006
     mysql_user: str = "root"
@@ -81,11 +80,10 @@ class Config(BaseModel):
             return default
 
     @classmethod
-    def get_logger(cls):
-        if not hasattr(cls, "logger"):
-            config: cls = cls.get_instance()
-            log_level = config.log_level.upper()
-            logging_config = {
+    def get_logging_config(cls):
+        config :Config = cls.get_instance()
+        log_level = config.log_level.upper()
+        return {
                 "version": 1,
                 "disable_existing_loggers": False,
                 "formatters": {
@@ -117,6 +115,10 @@ class Config(BaseModel):
                     'level': config.srv_environment == DEVELOP and log_level or "WARNING",
                 }
             }
-            logging.config.dictConfig(logging_config)
+
+    @classmethod
+    def get_logger(cls):
+        if not hasattr(cls, "logger"):
+            logging.config.dictConfig(cls.get_logging_config())
             setattr(cls, "logger", logging.getLogger("simple"))
         return getattr(cls, "logger")

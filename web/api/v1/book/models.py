@@ -7,6 +7,7 @@ LastEditors: xiangcai
 LastEditTime: 2022-03-11 10:08:25
 Description: file content
 '''
+import json
 from threading import Lock
 from datetime import datetime
 from typing import Dict, List, Any
@@ -28,12 +29,12 @@ class Book(BaseModel):
     year: int
 
     class Config:
-        schema_extra = {
+        json_schema_extra = json.dumps({
             "bid": 1,
             "name": "我的世界",
             "author": "佚名",
             "year": 2022
-        }
+        })
 
 
 class Books(object):

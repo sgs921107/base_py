@@ -6,4 +6,4 @@
  # @Description: 运行单元测试
 ### 
 
-cd ../test_example && pytest $*
+cd ../test_example && python -m pytest $*
