@@ -80,7 +80,7 @@ class Config(BaseModel):
             return default
 
     @classmethod
-    def get_logging_config(cls):
+    def get_logging_config(cls) -> dict[str, Any]:
         config :Config = cls.get_instance()
         log_level = config.log_level.upper()
         return {
@@ -117,7 +117,7 @@ class Config(BaseModel):
             }
 
     @classmethod
-    def get_logger(cls):
+    def get_logger(cls) -> logging.Logger:
         if not hasattr(cls, "logger"):
             logging.config.dictConfig(cls.get_logging_config())
             setattr(cls, "logger", logging.getLogger("simple"))
