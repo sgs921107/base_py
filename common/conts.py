@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding=utf8 -*-
 
+import json
 import time
 import socket
 import platform
@@ -49,7 +50,19 @@ UTF8 = "utf-8"
 ENV_PATH = "%s/deploy/.env" % dirname(dirname(realpath(__file__)))
 
 # 日志
-DEFAULT_LOG_FORMAT = "%(asctime)s - pid:%(process)d - %(filename)s [line: %(lineno)d] [%(levelname)s] ----- %(message)s"
+DEFAULT_LOG_FORMAT = json.dumps(
+    obj={
+    "level": "%(levelname)s",
+    "time": "%(asctime)s",
+    "pid": "%(process)s",
+    "filename": "%(filename)s",
+    "line": "%(lineno)s",
+    "msg": "%(message)s",
+    "ctx": "%(args)s",
+    },
+    separators=(",", ":"),
+    ensure_ascii=False
+)
 DEFAULT_LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
 
 
